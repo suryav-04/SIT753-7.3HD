@@ -1,5 +1,6 @@
 const request = require('supertest');
-const app = require('../src/app');
+const app = require('../../app');
+
 
 describe('Book API', () => {
   it('GET /books returns empty list initially', async () => {
