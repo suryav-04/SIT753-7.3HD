@@ -2,22 +2,21 @@ pipeline {
     agent any
 
     environment {
-        SONAR_TOKEN = credentials('sonar-token')  // Add this secret in Jenkins
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     stages {
-
         stage('Build') {
             steps {
                 echo '🔧 Installing dependencies...'
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Test') {
             steps {
-                echo '🧪 Running unit tests...'
-                sh 'npm test'
+                echo '🧪 Running tests...'
+                bat 'npm test'
             }
         }
 
@@ -25,7 +24,7 @@ pipeline {
             steps {
                 echo '📊 Running SonarCloud analysis...'
                 withSonarQubeEnv('SonarCloud') {
-                    sh 'npx sonar-scanner'
+                    bat 'npx sonar-scanner'
                 }
             }
         }
@@ -33,31 +32,31 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo '🔐 Running npm audit...'
-                sh 'npm audit --audit-level=high || true'
+                bat 'npm audit --audit-level=high || exit /b 0'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Building Docker image...'
-                sh 'docker build -t bookify-api .'
+                bat 'docker build -t bookify-api .'
             }
         }
 
         stage('Release Tag') {
             steps {
                 echo '🏷️ Creating release tag...'
-                sh 'git config user.name "Surya Vignesh"'
-                sh 'git config user.email "suryavigneshk04@gmail.com"'
-                sh 'git tag v1.0.0 || true'
-                sh 'git push origin v1.0.0 || true'
+                bat 'git config user.name "Surya Vignesh"'
+                bat 'git config user.email "suryavigneshk04@gmail.com"'
+                bat 'git tag v1.0.0 || exit /b 0'
+                bat 'git push origin v1.0.0 || exit /b 0'
             }
         }
 
         stage('Monitoring Health') {
             steps {
                 echo '📡 Checking health endpoint...'
-                sh 'curl --fail http://localhost:3000/health || echo "⚠️ App not live or not deployed."'
+                bat 'curl http://localhost:3000/health || echo "⚠️ App not live or not deployed."'
             }
         }
     }
