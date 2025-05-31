@@ -53,6 +53,14 @@ pipeline {
             }
         }
 
+        stage('Run App in Background') {
+            steps {
+                echo '🚀 Starting app in background...'
+                bat 'start /MIN cmd /c "node src/app.js"'
+                bat 'timeout /T 5'
+            }
+        }
+
         stage('Monitoring Health') {
             steps {
                 echo '📡 Checking health endpoint...'
